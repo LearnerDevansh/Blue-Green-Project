@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Terraform local files
+Infra/EKS/.terraform/
+Infra/EKS/.terraform.lock.hcl
