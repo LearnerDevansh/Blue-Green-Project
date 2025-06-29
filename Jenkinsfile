@@ -7,18 +7,24 @@ pipeline {
         SONAR_PROJECT_KEY = 'bankapp'
         SONAR_HOST_URL = 'http://localhost:9000'
         SONAR_LOGIN = credentials('sonar-token')
+        GITHUB_TOKEN = credentials('github-creds') // for GitHub auth if needed
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                git url: 'https://github.com/LearnerDevansh/Blue-Green-Project.git'
+                git(
+                    url: 'https://github.com/LearnerDevansh/Blue-Green-Project.git',
+                    credentialsId: 'github-creds',
+                    branch: 'main'
+                )
             }
         }
 
         stage('Maven .jar Build') {
             steps {
+                sh 'rm -rf ~/.m2/repository/org/hibernate/orm/hibernate-core'
                 sh 'mvn clean package -DskipTests=true'
             }
         }
