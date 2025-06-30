@@ -2,12 +2,16 @@ package com.example.bankapp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+// import org.springframework.test.context.ActiveProfiles;
+// import org.springframework.test.context.TestPropertySource;
+
+import jakarta.transaction.Transactional;
 
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@Transactional
+// @TestPropertySource(locations = "classpath:application-test.properties")
 
-class BankappApplicationTests {
+public class BankappApplicationTests {
 
     @Test
     void contextLoads() {
