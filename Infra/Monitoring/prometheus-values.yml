@@ -1,0 +1,15 @@
+server:
+  service:
+    type: NodePort
+
+extraScrapeConfigs: |
+  - job_name: 'bankapp'
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_namespace]
+        action: keep
+        regex: bankapp-service;default
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: keep
+        regex: "8081"

@@ -7,13 +7,14 @@ pipeline {
         SONAR_PROJECT_KEY = 'bankapp'
         SONAR_HOST_URL = 'http://localhost:9000'
         SONAR_LOGIN = credentials('sonar-token')
-        GITHUB_TOKEN = credentials('github-creds') // for GitHub auth if needed
+        GITHUB_TOKEN = credentials('github-creds')
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
+                echo "📥 Checking out source code..."
                 git(
                     url: 'https://github.com/LearnerDevansh/Blue-Green-Project.git',
                     credentialsId: 'github-creds',
@@ -22,15 +23,16 @@ pipeline {
             }
         }
 
-        stage('Maven .jar Build') {
+        stage('Maven Build') {
             steps {
-                sh 'rm -rf ~/.m2/repository/org/hibernate/orm/hibernate-core'
+                echo "🛠️ Building application..."
                 sh 'mvn clean package -DskipTests=true'
             }
         }
 
-        stage('Unit and Integration Tests') {
+        stage('Run Unit Tests') {
             steps {
+                echo "🧪 Running unit tests..."
                 sh 'mvn test'
             }
             post {
@@ -42,46 +44,50 @@ pipeline {
 
         stage('Trivy File Scan') {
             steps {
+                echo "🔍 Scanning source files..."
                 sh 'trivy fs --exit-code 0 --severity HIGH,CRITICAL .'
             }
         }
 
         stage('SonarQube Scan') {
-            environment {
-                SONAR_SCANNER_HOME = tool 'SonarQubeScanner'
-            }
             steps {
+                echo "📡 Running SonarQube analysis..."
                 withSonarQubeEnv('MySonarQube') {
-                    sh '''
-                        ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                    sh """
+                        mvn verify sonar:sonar \
                         -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                        -Dsonar.sources=src \
-                        -Dsonar.java.binaries=target \
                         -Dsonar.host.url=${SONAR_HOST_URL} \
                         -Dsonar.login=${SONAR_LOGIN}
-                    '''
+                    """
                 }
             }
         }
 
-        stage('Docker Image Build') {
+        stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_REGISTRY/$IMAGE_NAME .'
+                echo "🐳 Building Docker image..."
+                sh 'docker build -t $DOCKER_REGISTRY/$IMAGE_NAME:latest .'
             }
         }
 
         stage('Trivy Image Scan') {
             steps {
+                echo "🔬 Scanning Docker image..."
                 sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL $DOCKER_REGISTRY/$IMAGE_NAME || echo "🔴 Vulnerabilities found!"'
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Push Docker Image') {
             steps {
+                echo "📤 Pushing Docker image..."
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     sh '''
                         echo "$PASSWORD" | docker login -u "$USERNAME" --password-stdin
-                        docker push $DOCKER_REGISTRY/$IMAGE_NAME
+                        docker push "$DOCKER_REGISTRY/$IMAGE_NAME:latest" || {
+                            echo "⏳ First push failed. Retrying..."
+                            sleep 10
+                            docker push "$DOCKER_REGISTRY/$IMAGE_NAME:latest"
+                        }
                     '''
                 }
             }

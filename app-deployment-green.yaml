@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bankapp-green
+  labels:
+    app: bankapp
+    version: green
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bankapp
+      version: green
+  template:
+    metadata:
+      labels:
+        app: bankapp
+        version: green
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8081"
+        prometheus.io/path: "/actuator/prometheus"
+    spec:
+      containers:
+      - name: bankapp
+        image: localhost:5000/bankapp-image:latest
+        ports:
+        - containerPort: 8081
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:mysql://mysql-service:3306/bankappdb
+        - name: SPRING_DATASOURCE_USERNAME
+          value: root
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: Test@123
