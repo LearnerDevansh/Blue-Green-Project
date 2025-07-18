@@ -3,14 +3,13 @@ package com.example.bankapp.config;
 import com.example.bankapp.service.AccountService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.FrameOptionsMode;
 
 @Configuration
 @EnableWebSecurity
@@ -44,7 +43,7 @@ public class SecurityConfig {
             )
             .csrf(csrf -> csrf.disable())
             .headers(headers -> headers
-                .frameOptions().mode(FrameOptionsMode.SAMEORIGIN)
+                .frameOptions(Customizer.withDefaults()) // `withDefaults()` uses `DENY`
             );
 
         return http.build();
@@ -53,10 +52,5 @@ public class SecurityConfig {
     @Bean
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(accountService).passwordEncoder(passwordEncoder());
     }
 }
