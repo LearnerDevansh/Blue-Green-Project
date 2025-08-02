@@ -1,3 +1,4 @@
+// Removed misplaced code from top of file
 package com.example.bankapp.service;
 
 import com.example.bankapp.model.Account;
@@ -132,6 +133,36 @@ public class AccountService implements UserDetailsService {
                 toAccount
         );
         transactionRepository.save(creditTransaction);
+    }
+
+
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
+    }
+
+    public Account saveAccount(Account account) {
+        return accountRepository.save(account);
+    }
+
+
+    public Account updateAccount(Long id, Account updatedAccount) {
+        return accountRepository.findById(id)
+                .map(account -> {
+                    account.setUsername(updatedAccount.getUsername());
+                    account.setPassword(updatedAccount.getPassword());
+                    account.setBalance(updatedAccount.getBalance());
+                    // Add more fields as needed
+                    return accountRepository.save(account);
+                })
+                .orElse(null);
+    }
+
+    public void deleteAccount(Long id) {
+        accountRepository.deleteById(id);
+    }
+
+    public Account getAccountById(Long id) {
+        return accountRepository.findById(id).orElse(null);
     }
 
 }
