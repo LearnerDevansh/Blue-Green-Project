@@ -5,7 +5,6 @@ import com.example.bankapp.model.Account;
 import com.example.bankapp.model.Transaction;
 import com.example.bankapp.repository.AccountRepository;
 import com.example.bankapp.repository.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,20 +16,20 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 @Service
 public class AccountService implements UserDetailsService {
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
 
-    @Autowired
-    private AccountRepository accountRepository;
-
-    @Autowired
-    private TransactionRepository transactionRepository;
+    public AccountService(PasswordEncoder passwordEncoder, AccountRepository accountRepository, TransactionRepository transactionRepository) {
+        this.passwordEncoder = passwordEncoder;
+        this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
+    }
 
     public Account findAccountByUsername(String username) {
         return accountRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Account not found"));
@@ -38,7 +37,7 @@ public class AccountService implements UserDetailsService {
 
     public Account registerAccount(String username, String password) {
         if (accountRepository.findByUsername(username).isPresent()) {
-            throw new RuntimeException("Username already exists");
+            throw new UsernameAlreadyExistsException("Username already exists");
         }
 
         Account account = new Account();
@@ -64,7 +63,7 @@ public class AccountService implements UserDetailsService {
 
     public void withdraw(Account account, BigDecimal amount) {
         if (account.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException("Insufficient funds");
+            throw new InsufficientFundsException("Insufficient funds");
         }
         account.setBalance(account.getBalance().subtract(amount));
         accountRepository.save(account);
@@ -97,13 +96,13 @@ public class AccountService implements UserDetailsService {
                 authorities());
     }
 
-    public Collection<? extends GrantedAuthority> authorities() {
+    public List<GrantedAuthority> authorities() {
         return Arrays.asList(new SimpleGrantedAuthority("USER"));
     }
 
     public void transferAmount(Account fromAccount, String toUsername, BigDecimal amount) {
         if (fromAccount.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException("Insufficient funds");
+            throw new InsufficientFundsException("Insufficient funds");
         }
 
         Account toAccount = accountRepository.findByUsername(toUsername)

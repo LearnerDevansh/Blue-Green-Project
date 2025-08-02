@@ -1,6 +1,6 @@
 package com.example.bankapp.config;
 
-import com.example.bankapp.service.AccountService;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -15,11 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final AccountService accountService;
-
-    public SecurityConfig(AccountService accountService) {
-        this.accountService = accountService;
-    }
+    // Removed unused AccountService field and constructor
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

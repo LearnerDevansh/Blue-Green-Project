@@ -19,7 +19,7 @@ public class Account implements UserDetails {
     private BigDecimal balance;
 
     @OneToMany(mappedBy = "account")
-    private List<Transaction> transactions;
+    private transient List<Transaction> transactions;
 
     @Transient
     private Collection<? extends GrantedAuthority> authorities;

@@ -42,7 +42,7 @@ public class BankController {
         Account account = accountService.getAccountById(id);
         if (account == null) {
             model.addAttribute(ERROR, NOT_FOUND);
-            return "error";
+            return ERROR;
         }
         model.addAttribute(ACCOUNT, account);
         return "editAccount";
