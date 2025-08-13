@@ -16,47 +16,58 @@ public class BankController {
     private static final String ACCOUNT = "account";
     private static final String ACCOUNTS = "accounts";
     private static final String ERROR = "error";
-    private static final String REDIRECT_HOME = "redirect:/";
     private static final String NOT_FOUND = "Account not found";
 
-    @GetMapping("/")
+    @GetMapping({"/", "/accounts"})
     public String home(Model model) {
         model.addAttribute(ACCOUNTS, accountService.getAllAccounts());
         return "home";
     }
 
-    @GetMapping("/add")
+    @GetMapping({"/add", "/accounts/add"})
     public String showAddForm(Model model) {
         model.addAttribute(ACCOUNT, new Account());
         return "addAccount";
     }
 
-    @PostMapping("/add")
-    public String addAccount(@ModelAttribute Account account) {
+    @PostMapping({"/add", "/accounts/add"})
+    public String addAccount(@ModelAttribute(ACCOUNT) Account account) {
         accountService.saveAccount(account);
-        return REDIRECT_HOME;
+        return "redirect:/";
     }
 
-    @GetMapping("/edit/{id}")
+    @GetMapping({"/edit/{id}", "/accounts/edit/{id}"})
     public String showEditForm(@PathVariable Long id, Model model) {
         Account account = accountService.getAccountById(id);
         if (account == null) {
             model.addAttribute(ERROR, NOT_FOUND);
-            return ERROR;
+            return "error";
         }
         model.addAttribute(ACCOUNT, account);
         return "editAccount";
     }
 
-    @PostMapping("/edit/{id}")
-    public String editAccount(@PathVariable Long id, @ModelAttribute Account account) {
+    @PostMapping({"/edit/{id}", "/accounts/edit/{id}"})
+    public String editAccount(@PathVariable Long id, @ModelAttribute(ACCOUNT) Account account) {
         accountService.updateAccount(id, account);
-        return REDIRECT_HOME;
+        return "redirect:/";
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping({"/delete/{id}", "/accounts/delete/{id}"})
     public String deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
-        return REDIRECT_HOME;
+        return "redirect:/";
+    }
+
+    // 🔹 NEW: Single account view
+    @GetMapping({"/account/{id}", "/accounts/{id}"})
+    public String viewAccount(@PathVariable Long id, Model model) {
+        Account account = accountService.getAccountById(id);
+        if (account == null) {
+            model.addAttribute(ERROR, NOT_FOUND);
+            return "error";
+        }
+        model.addAttribute(ACCOUNT, account);
+        return "account";
     }
 }
