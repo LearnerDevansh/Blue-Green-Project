@@ -13,22 +13,33 @@ public class BankController {
 
     private final AccountService accountService;
 
+    // Model attribute constants
     private static final String ACCOUNT = "account";
     private static final String ACCOUNTS = "accounts";
     private static final String ERROR = "error";
+
+    // Message constants
     private static final String NOT_FOUND = "Account not found";
+
+    // View constants
+    private static final String HOME_VIEW = "home";
+    private static final String ADD_VIEW = "addAccount";
+    private static final String EDIT_VIEW = "editAccount";
+    private static final String ACCOUNT_VIEW = "account";
+
+    // Redirect constant
     private static final String REDIRECT_HOME = "redirect:/";
 
     @GetMapping({"/", "/accounts"})
     public String home(Model model) {
         model.addAttribute(ACCOUNTS, accountService.getAllAccounts());
-        return "home";
+        return HOME_VIEW;
     }
 
     @GetMapping({"/add", "/accounts/add"})
     public String showAddForm(Model model) {
         model.addAttribute(ACCOUNT, new Account());
-        return "addAccount";
+        return ADD_VIEW;
     }
 
     @PostMapping({"/add", "/accounts/add"})
@@ -45,7 +56,7 @@ public class BankController {
             return ERROR;
         }
         model.addAttribute(ACCOUNT, account);
-        return "editAccount";
+        return EDIT_VIEW;
     }
 
     @PostMapping({"/edit/{id}", "/accounts/edit/{id}"})
@@ -68,6 +79,6 @@ public class BankController {
             return ERROR;
         }
         model.addAttribute(ACCOUNT, account);
-        return "account";
+        return ACCOUNT_VIEW;
     }
 }
