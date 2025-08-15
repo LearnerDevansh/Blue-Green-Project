@@ -55,7 +55,8 @@ class AccountServiceTest {
     void testFindAccountByUsername_NotFound() {
         when(accountRepository.findByUsername("missing")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> accountService.findAccountByUsername("missing"))
+        String username = "missing";
+        assertThatThrownBy(() -> accountService.findAccountByUsername(username))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Account not found");
     }
@@ -87,7 +88,9 @@ class AccountServiceTest {
     void testRegisterAccount_UsernameExists() {
         when(accountRepository.findByUsername("exists")).thenReturn(Optional.of(new Account()));
 
-        assertThatThrownBy(() -> accountService.registerAccount("exists", "pass"))
+        String username = "exists";
+        String password = "pass";
+        assertThatThrownBy(() -> accountService.registerAccount(username, password))
                 .isInstanceOf(UsernameAlreadyExistsException.class)
                 .hasMessage("Username already exists");
     }
@@ -123,7 +126,8 @@ class AccountServiceTest {
         Account acc = new Account();
         acc.setBalance(BigDecimal.valueOf(10));
 
-        assertThatThrownBy(() -> accountService.withdraw(acc, BigDecimal.valueOf(50)))
+        BigDecimal withdrawAmount = BigDecimal.valueOf(50);
+        assertThatThrownBy(() -> accountService.withdraw(acc, withdrawAmount))
                 .isInstanceOf(InsufficientFundsException.class)
                 .hasMessage("Insufficient funds");
 
@@ -164,8 +168,9 @@ class AccountServiceTest {
     void testLoadUserByUsername_NotFound() {
         when(accountRepository.findByUsername("missing")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> accountService.loadUserByUsername("missing"))
-                .isInstanceOf(RuntimeException.class) // from findAccountByUsername
+        String username = "missing";
+        assertThatThrownBy(() -> accountService.loadUserByUsername(username))
+                .isInstanceOf(RuntimeException.class)
                 .hasMessage("Account not found");
     }
 
@@ -182,7 +187,8 @@ class AccountServiceTest {
 
         when(accountRepository.findByUsername("to")).thenReturn(Optional.of(to));
 
-        accountService.transferAmount(from, "to", BigDecimal.valueOf(100));
+        BigDecimal transferAmount = BigDecimal.valueOf(100);
+        accountService.transferAmount(from, "to", transferAmount);
 
         assertThat(from.getBalance()).isEqualTo(BigDecimal.valueOf(400));
         assertThat(to.getBalance()).isEqualTo(BigDecimal.valueOf(300));
@@ -196,7 +202,8 @@ class AccountServiceTest {
         Account from = new Account();
         from.setBalance(BigDecimal.valueOf(50));
 
-        assertThatThrownBy(() -> accountService.transferAmount(from, "toUser", BigDecimal.valueOf(100)))
+        BigDecimal transferAmount = BigDecimal.valueOf(100);
+        assertThatThrownBy(() -> accountService.transferAmount(from, "toUser", transferAmount))
                 .isInstanceOf(InsufficientFundsException.class)
                 .hasMessage("Insufficient funds");
 
@@ -211,7 +218,8 @@ class AccountServiceTest {
 
         when(accountRepository.findByUsername("missing")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> accountService.transferAmount(from, "missing", BigDecimal.valueOf(100)))
+        BigDecimal transferAmount = BigDecimal.valueOf(100);
+        assertThatThrownBy(() -> accountService.transferAmount(from, "missing", transferAmount))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Recipient account not found");
     }

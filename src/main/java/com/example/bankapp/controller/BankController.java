@@ -17,6 +17,7 @@ public class BankController {
     private static final String ACCOUNTS = "accounts";
     private static final String ERROR = "error";
     private static final String NOT_FOUND = "Account not found";
+    private static final String REDIRECT_HOME = "redirect:/";
 
     @GetMapping({"/", "/accounts"})
     public String home(Model model) {
@@ -33,7 +34,7 @@ public class BankController {
     @PostMapping({"/add", "/accounts/add"})
     public String addAccount(@ModelAttribute(ACCOUNT) Account account) {
         accountService.saveAccount(account);
-        return "redirect:/";
+        return REDIRECT_HOME;
     }
 
     @GetMapping({"/edit/{id}", "/accounts/edit/{id}"})
@@ -41,7 +42,7 @@ public class BankController {
         Account account = accountService.getAccountById(id);
         if (account == null) {
             model.addAttribute(ERROR, NOT_FOUND);
-            return "error";
+            return ERROR;
         }
         model.addAttribute(ACCOUNT, account);
         return "editAccount";
@@ -50,22 +51,21 @@ public class BankController {
     @PostMapping({"/edit/{id}", "/accounts/edit/{id}"})
     public String editAccount(@PathVariable Long id, @ModelAttribute(ACCOUNT) Account account) {
         accountService.updateAccount(id, account);
-        return "redirect:/";
+        return REDIRECT_HOME;
     }
 
     @GetMapping({"/delete/{id}", "/accounts/delete/{id}"})
     public String deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
-        return "redirect:/";
+        return REDIRECT_HOME;
     }
 
-    // 🔹 NEW: Single account view
     @GetMapping({"/account/{id}", "/accounts/{id}"})
     public String viewAccount(@PathVariable Long id, Model model) {
         Account account = accountService.getAccountById(id);
         if (account == null) {
             model.addAttribute(ERROR, NOT_FOUND);
-            return "error";
+            return ERROR;
         }
         model.addAttribute(ACCOUNT, account);
         return "account";
