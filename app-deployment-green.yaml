@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: bankapp
-        image: localhost:5000/bankapp-image:latest
+        image: 192.168.185.12:5000/bankapp-image:latest
         ports:
         - containerPort: 8081
         env:
