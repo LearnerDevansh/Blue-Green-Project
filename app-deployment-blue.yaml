@@ -22,8 +22,8 @@ spec:
         prometheus.io/path: "/actuator/prometheus"
     spec:
       containers:
-        - name: bankapp
-          image: 192.168.185.12:5000/bankapp-image:v4
+        - name: bank-app
+          image: 008971675413.dkr.ecr.us-east-1.amazonaws.com/bank_app:blue
           imagePullPolicy: Never
           ports:
             - containerPort: 8081
