@@ -11,6 +11,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -39,8 +40,11 @@ public class SecurityConfig {
             )
             .csrf(csrf -> csrf.disable())
             .headers(headers -> headers
-                .frameOptions(Customizer.withDefaults()) // `withDefaults()` uses `DENY`
-            );
+                .frameOptions(Customizer.withDefaults())
+            )
+            .requiresChannel(channel ->
+                channel.anyRequest().requiresSecure())    // `withDefaults()` uses `DENY`
+            ;
 
         return http.build();
     }
