@@ -24,7 +24,6 @@ spec:
       containers:
         - name: bank-app
           image: 008971675413.dkr.ecr.us-east-1.amazonaws.com/bank_app:blue
-          imagePullPolicy: Never
           ports:
             - containerPort: 8081
           env:
