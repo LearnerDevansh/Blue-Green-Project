@@ -7,6 +7,7 @@ metadata:
     prometheus.io/port: "8081"
     prometheus.io/path: "/actuator/prometheus"
 spec:
+  type: LoadBalancer
   selector:
     app: bankapp
   ports:
